@@ -3,7 +3,7 @@
 
 # vite-package
 
-[![Node CI](https://github.com/hexlet-boilerplates/vite-package/actions/workflows/nodejs.yml/badge.svg)](https://github.com/hexlet-boilerplates/vite-package/actions/workflows/nodejs.yml)
+[![Node CI](https://github.com/Mikhail-o0/frontend-project-11/actions/workflows/nodejs.yml/badge.svg)](https://github.com/Mikhail-o0/frontend-project-11/actions/workflows/nodejs.yml)
 
 ## Setup
 
