@@ -5,7 +5,7 @@ develop:
 	npm run dev
 
 lint:
-	npx eslint .
+	npx eslint src
 
 build:
 	NODE_ENV=production npm run build
