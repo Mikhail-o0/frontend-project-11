@@ -17,7 +17,7 @@ const fetchRSS = (url) => {
       }
       return response.data.contents;
     })
-    .catch((err) => {
+    .catch(() => {
       throw new Error('network');
     });
 };

@@ -1,5 +1,5 @@
 const handleProcessState = (state, elements, i18n) => {
-  const { form, input, submitButton, feedback } = elements;
+  const { input, submitButton, feedback } = elements;
   
   switch (state.form.state) {
     case 'filling':
@@ -114,7 +114,7 @@ const renderPosts = (state, elements, i18n) => {
   postsContainer.innerHTML = postsHtml;
 };
 
-const render = (state, elements, i18n) => (path, value) => {
+const render = (state, elements, i18n) => (path) => {
   switch (path) {
     case 'form.state':
       handleProcessState(state, elements, i18n);
