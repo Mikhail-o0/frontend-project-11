@@ -1,4 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.js';
 import onChange from 'on-change';
 import i18next from 'i18next';
 import { v4 as uuidv4 } from 'uuid';
@@ -18,7 +19,7 @@ const app = () => {
   }).then(() => {
     const state = {
       form: {
-        state: 'filling', // filling, sending, success, error
+        state: 'filling',
         error: null,
         valid: true,
       },
@@ -47,53 +48,103 @@ const app = () => {
 
     const watchedState = onChange(state, render(state, elements, i18nInstance));
 
-    const processRSS = (url) => {
-  const existingUrls = state.feeds.map((feed) => feed.url);
-  
-  watchedState.form.state = 'sending';
-  watchedState.form.error = null;
-  
-  return validate(url, existingUrls, i18nInstance)
-    .then(() => fetchRSS(url))
-    .then((xmlString) => parseRSS(xmlString))
-    .then((parsedData) => {
-      const feedId = uuidv4();
+    // Проверка обновлений для одного фида
+    const checkFeedUpdates = (feed) => {
+      return fetchRSS(feed.url)
+        .then((xmlString) => parseRSS(xmlString))
+        .then((parsedData) => {
+          const existingPosts = state.posts.filter((post) => post.feedId === feed.id);
+          const existingLinks = new Set(existingPosts.map((post) => post.link));
+          
+          const newPosts = parsedData.posts
+            .filter((post) => !existingLinks.has(post.link))
+            .map((post) => ({
+              id: uuidv4(),
+              feedId: feed.id,
+              title: post.title,
+              description: post.description,
+              link: post.link,
+            }));
+          
+          if (newPosts.length > 0) {
+            watchedState.posts.unshift(...newPosts);
+          }
+        })
+        .catch((err) => {
+          console.error(`Failed to update feed ${feed.url}:`, err);
+        });
+    };
+
+    // Рекурсивное автообновление
+    const startAutoUpdate = () => {
+      const delay = 5000;
       
-      const newFeed = {
-        id: feedId,
-        url,
-        title: parsedData.feed.title,
-        description: parsedData.feed.description,
+      const checkAllFeeds = () => {
+        const promises = state.feeds.map((feed) => checkFeedUpdates(feed));
+        
+        Promise.all(promises)
+          .finally(() => {
+            setTimeout(checkAllFeeds, delay);
+          });
       };
       
-      const newPosts = parsedData.posts.map((post) => ({
-        id: uuidv4(),
-        feedId,
-        ...post,
-      }));
-      
-      watchedState.feeds.unshift(newFeed);
-      watchedState.posts.unshift(...newPosts);
-      
-      watchedState.form.state = 'success';
-      watchedState.form.valid = true;
-    })
-    .catch((err) => {
-      let errorKey;
-      if (err.name === 'ValidationError') {
-        errorKey = err.type; // 'required', 'url', 'notOneOf'
-      } else if (err.message === 'parse') {
-        errorKey = 'parse';
-      } else {
-        errorKey = 'network';
-      }
-      
-      watchedState.form.valid = false;
-      watchedState.form.error = errorKey;
-      watchedState.form.state = 'error';
-    });
-};
+      setTimeout(checkAllFeeds, delay);
+    };
 
+    const processRSS = (url) => {
+      const existingUrls = state.feeds.map((feed) => feed.url);
+      
+      watchedState.form.state = 'sending';
+      watchedState.form.error = null;
+      
+      return validate(url, existingUrls, i18nInstance)
+        .then(() => fetchRSS(url))
+        .then((xmlString) => parseRSS(xmlString))
+        .then((parsedData) => {
+          const feedId = uuidv4();
+          
+          const newFeed = {
+            id: feedId,
+            url,
+            title: parsedData.feed.title,
+            description: parsedData.feed.description,
+          };
+          
+          const newPosts = parsedData.posts.map((post) => ({
+            id: uuidv4(),
+            feedId,
+            title: post.title,
+            description: post.description,
+            link: post.link,
+          }));
+          
+          watchedState.feeds.unshift(newFeed);
+          watchedState.posts.unshift(...newPosts);
+          
+          watchedState.form.state = 'success';
+          watchedState.form.valid = true;
+          
+          if (state.feeds.length === 1) {
+            startAutoUpdate();
+          }
+        })
+        .catch((err) => {
+          let errorKey;
+          if (err.name === 'ValidationError') {
+            errorKey = err.type;
+          } else if (err.message === 'parse') {
+            errorKey = 'parse';
+          } else {
+            errorKey = 'network';
+          }
+          
+          watchedState.form.valid = false;
+          watchedState.form.error = errorKey;
+          watchedState.form.state = 'error';
+        });
+    };
+
+    // Обработчик формы
     elements.form.addEventListener('submit', (e) => {
       e.preventDefault();
       
@@ -103,11 +154,43 @@ const app = () => {
       processRSS(url);
     });
 
+    // Очистка ошибок при вводе
     elements.input.addEventListener('input', () => {
       if (!state.form.valid || state.form.error) {
         watchedState.form.valid = true;
         watchedState.form.error = null;
       }
+    });
+
+    // ОБРАБОТЧИКИ МОДАЛКИ И ПОСТОВ
+    
+    // Делегирование кликов на посты
+    elements.postsContainer.addEventListener('click', (e) => {
+      const postId = e.target.dataset.id;
+      if (!postId) {
+        return;
+      }
+      
+      // Кнопка "Просмотр" — открываем модалку и помечаем прочитанным
+      if (e.target.tagName === 'BUTTON') {
+        watchedState.uiState.modalPostId = postId;
+        
+        if (!state.uiState.viewedPostIds.has(postId)) {
+          watchedState.uiState.viewedPostIds.add(postId);
+        }
+      }
+      
+      // Ссылка на пост — просто помечаем прочитанным
+      if (e.target.tagName === 'A') {
+        if (!state.uiState.viewedPostIds.has(postId)) {
+          watchedState.uiState.viewedPostIds.add(postId);
+        }
+      }
+    });
+
+    // Сброс modalPostId при закрытии модалки
+    elements.modal.element.addEventListener('hidden.bs.modal', () => {
+      watchedState.uiState.modalPostId = null;
     });
   });
 };

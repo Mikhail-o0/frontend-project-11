@@ -1,5 +1,5 @@
 const handleProcessState = (state, elements, i18n) => {
-  const { input, submitButton, feedback } = elements;
+  const { form, input, submitButton, feedback } = elements;
   
   switch (state.form.state) {
     case 'filling':
@@ -114,7 +114,25 @@ const renderPosts = (state, elements, i18n) => {
   postsContainer.innerHTML = postsHtml;
 };
 
-const render = (state, elements, i18n) => (path) => {
+const renderModal = (state, elements) => {
+  const { modal } = elements;
+  const { modalPostId } = state.uiState;
+  
+  if (!modalPostId) {
+    return;
+  }
+  
+  const post = state.posts.find((p) => p.id === modalPostId);
+  if (!post) {
+    return;
+  }
+  
+  modal.title.textContent = post.title;
+  modal.body.textContent = post.description;
+  modal.link.href = post.link;
+};
+
+const render = (state, elements, i18n) => (path, value) => {
   switch (path) {
     case 'form.state':
       handleProcessState(state, elements, i18n);
@@ -134,6 +152,10 @@ const render = (state, elements, i18n) => (path) => {
       
     case 'uiState.viewedPostIds':
       renderPosts(state, elements, i18n);
+      break;
+      
+    case 'uiState.modalPostId':
+      renderModal(state, elements);
       break;
       
     default:
