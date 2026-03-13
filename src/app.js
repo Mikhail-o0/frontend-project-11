@@ -8,7 +8,7 @@ import createRSSController from './controller.js'
 
 const app = () => {
   const i18nInstance = i18next.createInstance()
-  
+
   i18nInstance.init({
     lng: 'ru',
     debug: false,
@@ -44,15 +44,15 @@ const app = () => {
     }
 
     const watchedState = onChange(state, render(state, elements, i18nInstance))
-  
+
     const rssController = createRSSController(state, watchedState, i18nInstance)
 
-    elements.form.addEventListener('submit', (e) => {
+    elements.form.addEventListener('submit', e => {
       e.preventDefault()
-      
+
       const formData = new FormData(e.target)
       const url = formData.get('url').trim()
-      
+
       rssController.processRSS(url)
     })
 
@@ -63,20 +63,20 @@ const app = () => {
       }
     })
 
-    elements.postsContainer.addEventListener('click', (e) => {
+    elements.postsContainer.addEventListener('click', e => {
       const postId = e.target.dataset.id
       if (!postId) {
         return
       }
-      
+
       if (e.target.tagName === 'BUTTON') {
         watchedState.uiState.modalPostId = postId
-        
+
         if (!state.uiState.viewedPostIds.has(postId)) {
           watchedState.uiState.viewedPostIds.add(postId)
         }
       }
-      
+
       if (e.target.tagName === 'A') {
         if (!state.uiState.viewedPostIds.has(postId)) {
           watchedState.uiState.viewedPostIds.add(postId)
