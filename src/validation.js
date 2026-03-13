@@ -1,4 +1,4 @@
-import * as yup from 'yup';
+import * as yup from 'yup'
 
 const buildSchema = (existingUrls, i18n) => {
   yup.setLocale({
@@ -9,18 +9,18 @@ const buildSchema = (existingUrls, i18n) => {
     string: {
       url: () => i18n.t('errors.url'),
     },
-  });
+  })
 
   return yup
     .string()
     .required()
     .url()
-    .notOneOf(existingUrls);
-};
+    .notOneOf(existingUrls)
+}
 
 const validate = (url, existingUrls, i18n) => {
-  const schema = buildSchema(existingUrls, i18n);
-  return schema.validate(url);
-};
+  const schema = buildSchema(existingUrls, i18n)
+  return schema.validate(url)
+}
 
-export default validate;
+export default validate
