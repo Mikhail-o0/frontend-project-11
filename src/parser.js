@@ -1,4 +1,4 @@
-const parseRSS = xmlString => {
+const parseRSS = (xmlString) => {
   const parser = new DOMParser()
   const xmlDoc = parser.parseFromString(xmlString, 'text/xml')
 

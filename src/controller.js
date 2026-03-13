@@ -4,10 +4,10 @@ import fetchRSS from './api.js'
 import parseRSS from './parser.js'
 
 const createRSSController = (state, watchedState, i18nInstance) => {
-  const checkFeedUpdates = feed => {
+  const checkFeedUpdates = (feed) => {
     return fetchRSS(feed.url)
       .then(xmlString => parseRSS(xmlString))
-      .then(parsedData => {
+      .then((parsedData) => {
         const existingPosts = state.posts.filter(post => post.feedId === feed.id)
         const existingLinks = new Set(existingPosts.map(post => post.link))
 
@@ -25,7 +25,7 @@ const createRSSController = (state, watchedState, i18nInstance) => {
           watchedState.posts.unshift(...newPosts)
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(`Failed to update feed ${feed.url}:`, err)
       })
   }
@@ -43,7 +43,7 @@ const createRSSController = (state, watchedState, i18nInstance) => {
     setTimeout(checkAllFeeds, delay)
   }
 
-  const processRSS = url => {
+  const processRSS = (url) => {
     const existingUrls = state.feeds.map(feed => feed.url)
 
     watchedState.form.state = 'sending'
@@ -52,7 +52,7 @@ const createRSSController = (state, watchedState, i18nInstance) => {
     return validate(url, existingUrls, i18nInstance)
       .then(() => fetchRSS(url))
       .then(xmlString => parseRSS(xmlString))
-      .then(parsedData => {
+      .then((parsedData) => {
         const feedId = uuidv4()
 
         const newFeed = {
@@ -80,13 +80,15 @@ const createRSSController = (state, watchedState, i18nInstance) => {
           startAutoUpdate()
         }
       })
-      .catch(err => {
+      .catch((err) => {
         let errorKey
         if (err.name === 'ValidationError') {
           errorKey = err.type
-        } else if (err.message === 'parse') {
+        } 
+        else if (err.message === 'parse') {
           errorKey = 'parse'
-        } else {
+        } 
+        else {
           errorKey = 'network'
         }
 

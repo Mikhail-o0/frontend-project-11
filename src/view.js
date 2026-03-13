@@ -38,7 +38,8 @@ const handleError = (state, elements) => {
 
   if (state.form.error) {
     input.classList.add('is-invalid')
-  } else {
+  } 
+  else {
     input.classList.remove('is-invalid')
   }
 }
@@ -84,7 +85,7 @@ const renderPosts = (state, elements, i18n) => {
         <h2 class="card-title h4">${i18n.t('postsTitle')}</h2>
       </div>
       <ul class="list-group border-0 rounded-0">
-        ${state.posts.map(post => {
+        ${state.posts.map((post) => {
           const isViewed = state.uiState.viewedPostIds.has(post.id)
           const linkClass = isViewed ? 'fw-normal link-secondary' : 'fw-bold'
 
@@ -132,7 +133,7 @@ const renderModal = (state, elements) => {
   modal.link.href = post.link
 }
 
-const render = (state, elements, i18n) => path => {
+const render = (state, elements, i18n) => (path) => {
   switch (path) {
     case 'form.state':
       handleProcessState(state, elements, i18n)
