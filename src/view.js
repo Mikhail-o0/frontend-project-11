@@ -57,7 +57,7 @@ const renderFeeds = (state, elements, i18n) => {
         <h2 class="card-title h4">${i18n.t('feedsTitle')}</h2>
       </div>
       <ul class="list-group border-0 rounded-0">
-        ${state.feeds.map(feed => `
+        ${state.feeds.map((feed) => `
           <li class="list-group-item border-0 border-end-0">
             <h3 class="h6 m-0">${feed.title}</h3>
             <p class="m-0 small text-black-50">${feed.description}</p>
@@ -84,7 +84,7 @@ const renderPosts = (state, elements, i18n) => {
         <h2 class="card-title h4">${i18n.t('postsTitle')}</h2>
       </div>
       <ul class="list-group border-0 rounded-0">
-        ${state.posts.map(post => {
+        ${state.posts.map((post) => {
           const isViewed = state.uiState.viewedPostIds.has(post.id)
           const linkClass = isViewed ? 'fw-normal link-secondary' : 'fw-bold'
 
@@ -122,7 +122,7 @@ const renderModal = (state, elements) => {
     return
   }
 
-  const post = state.posts.find(p => p.id === modalPostId)
+  const post = state.posts.find((p) => p.id === modalPostId)
   if (!post) {
     return
   }
@@ -132,7 +132,7 @@ const renderModal = (state, elements) => {
   modal.link.href = post.link
 }
 
-const render = (state, elements, i18n) => path => {
+const render = (state, elements, i18n) => (path) => {
   switch (path) {
     case 'form.state':
       handleProcessState(state, elements, i18n)

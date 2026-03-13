@@ -2,7 +2,7 @@ import axios from 'axios'
 
 const PROXY_URL = 'https://allorigins.hexlet.app/get'
 
-const fetchRSS = url => {
+const fetchRSS = (url) => {
   const params = new URLSearchParams({
     url,
     disableCache: 'true',
@@ -11,7 +11,7 @@ const fetchRSS = url => {
   const fullUrl = `${PROXY_URL}?${params.toString()}`
 
   return axios.get(fullUrl)
-    .then(response => {
+    .then((response) => {
       if (!response.data.contents) {
         throw new Error('network')
       }

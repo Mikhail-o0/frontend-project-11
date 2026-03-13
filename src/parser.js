@@ -1,4 +1,4 @@
-const parseRSS = xmlString => {
+const parseRSS = (xmlString) => {
   const parser = new DOMParser()
   const xmlDoc = parser.parseFromString(xmlString, 'text/xml')
 
@@ -16,7 +16,7 @@ const parseRSS = xmlString => {
   const feedDescription = channel.querySelector('description')?.textContent || ''
 
   const items = xmlDoc.querySelectorAll('item')
-  const posts = Array.from(items).map(item => ({
+  const posts = Array.from(items).map((item) => ({
     title: item.querySelector('title')?.textContent || '',
     description: item.querySelector('description')?.textContent || '',
     link: item.querySelector('link')?.textContent || '',

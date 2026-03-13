@@ -4,16 +4,16 @@ import fetchRSS from './api.js'
 import parseRSS from './parser.js'
 
 const createRSSController = (state, watchedState, i18nInstance) => {
-  const checkFeedUpdates = feed => {
+  const checkFeedUpdates = (feed) => {
     return fetchRSS(feed.url)
-      .then(xmlString => parseRSS(xmlString))
-      .then(parsedData => {
-        const existingPosts = state.posts.filter(post => post.feedId === feed.id)
-        const existingLinks = new Set(existingPosts.map(post => post.link))
+      .then((xmlString) => parseRSS(xmlString))
+      .then((parsedData) => {
+        const existingPosts = state.posts.filter((post) => post.feedId === feed.id)
+        const existingLinks = new Set(existingPosts.map((post) => post.link))
 
         const newPosts = parsedData.posts
-          .filter(post => !existingLinks.has(post.link))
-          .map(post => ({
+          .filter((post) => !existingLinks.has(post.link))
+          .map((post) => ({
             id: uuidv4(),
             feedId: feed.id,
             title: post.title,
@@ -25,14 +25,14 @@ const createRSSController = (state, watchedState, i18nInstance) => {
           watchedState.posts.unshift(...newPosts)
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(`Failed to update feed ${feed.url}:`, err)
       })
   }
 
   const startAutoUpdate = (delay = 5000) => {
     const checkAllFeeds = () => {
-      const promises = state.feeds.map(feed => checkFeedUpdates(feed))
+      const promises = state.feeds.map((feed) => checkFeedUpdates(feed))
 
       Promise.all(promises)
         .finally(() => {
@@ -43,16 +43,16 @@ const createRSSController = (state, watchedState, i18nInstance) => {
     setTimeout(checkAllFeeds, delay)
   }
 
-  const processRSS = url => {
-    const existingUrls = state.feeds.map(feed => feed.url)
+  const processRSS = (url) => {
+    const existingUrls = state.feeds.map((feed) => feed.url)
 
     watchedState.form.state = 'sending'
     watchedState.form.error = null
 
     return validate(url, existingUrls, i18nInstance)
       .then(() => fetchRSS(url))
-      .then(xmlString => parseRSS(xmlString))
-      .then(parsedData => {
+      .then((xmlString) => parseRSS(xmlString))
+      .then((parsedData) => {
         const feedId = uuidv4()
 
         const newFeed = {
@@ -62,7 +62,7 @@ const createRSSController = (state, watchedState, i18nInstance) => {
           description: parsedData.feed.description,
         }
 
-        const newPosts = parsedData.posts.map(post => ({
+        const newPosts = parsedData.posts.map((post) => ({
           id: uuidv4(),
           feedId,
           title: post.title,
@@ -80,7 +80,7 @@ const createRSSController = (state, watchedState, i18nInstance) => {
           startAutoUpdate()
         }
       })
-      .catch(err => {
+      .catch((err) => {
         let errorKey
         if (err.name === 'ValidationError') {
           errorKey = err.type
