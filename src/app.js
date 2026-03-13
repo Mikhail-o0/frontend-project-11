@@ -48,7 +48,6 @@ const app = () => {
 
     const watchedState = onChange(state, render(state, elements, i18nInstance));
 
-    // Проверка обновлений для одного фида
     const checkFeedUpdates = (feed) => {
       return fetchRSS(feed.url)
         .then((xmlString) => parseRSS(xmlString))
@@ -75,7 +74,6 @@ const app = () => {
         });
     };
 
-    // Рекурсивное автообновление
     const startAutoUpdate = () => {
       const delay = 5000;
       
@@ -144,7 +142,6 @@ const app = () => {
         });
     };
 
-    // Обработчик формы
     elements.form.addEventListener('submit', (e) => {
       e.preventDefault();
       
@@ -154,7 +151,6 @@ const app = () => {
       processRSS(url);
     });
 
-    // Очистка ошибок при вводе
     elements.input.addEventListener('input', () => {
       if (!state.form.valid || state.form.error) {
         watchedState.form.valid = true;
@@ -162,16 +158,12 @@ const app = () => {
       }
     });
 
-    // ОБРАБОТЧИКИ МОДАЛКИ И ПОСТОВ
-    
-    // Делегирование кликов на посты
     elements.postsContainer.addEventListener('click', (e) => {
       const postId = e.target.dataset.id;
       if (!postId) {
         return;
       }
       
-      // Кнопка "Просмотр" — открываем модалку и помечаем прочитанным
       if (e.target.tagName === 'BUTTON') {
         watchedState.uiState.modalPostId = postId;
         
@@ -180,7 +172,6 @@ const app = () => {
         }
       }
       
-      // Ссылка на пост — просто помечаем прочитанным
       if (e.target.tagName === 'A') {
         if (!state.uiState.viewedPostIds.has(postId)) {
           watchedState.uiState.viewedPostIds.add(postId);
@@ -188,7 +179,6 @@ const app = () => {
       }
     });
 
-    // Сброс modalPostId при закрытии модалки
     elements.modal.element.addEventListener('hidden.bs.modal', () => {
       watchedState.uiState.modalPostId = null;
     });
