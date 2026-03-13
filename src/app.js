@@ -47,7 +47,7 @@ const app = () => {
 
     const rssController = createRSSController(state, watchedState, i18nInstance)
 
-    elements.form.addEventListener('submit', (e) => {
+    elements.form.addEventListener('submit', e => {
       e.preventDefault()
 
       const formData = new FormData(e.target)
@@ -63,7 +63,7 @@ const app = () => {
       }
     })
 
-    elements.postsContainer.addEventListener('click', (e) => {
+    elements.postsContainer.addEventListener('click', e => {
       const postId = e.target.dataset.id
       if (!postId) {
         return
