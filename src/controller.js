@@ -84,10 +84,10 @@ const createRSSController = (state, watchedState, i18nInstance) => {
         let errorKey
         if (err.name === 'ValidationError') {
           errorKey = err.type
-        } 
+        }
         else if (err.message === 'parse') {
           errorKey = 'parse'
-        } 
+        }
         else {
           errorKey = 'network'
         }

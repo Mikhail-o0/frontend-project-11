@@ -38,7 +38,7 @@ const handleError = (state, elements) => {
 
   if (state.form.error) {
     input.classList.add('is-invalid')
-  } 
+  }
   else {
     input.classList.remove('is-invalid')
   }
